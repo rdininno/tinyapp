@@ -39,6 +39,8 @@ function generateRandomString() {
 ///////////////////////////////////////////////////////////////
 // ROUTES
 ///////////////////////////////////////////////////////////////
+
+//GETS
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
@@ -71,6 +73,13 @@ app.get("/u/:shortURL", (req, res) => {
   const longURL = `http://${urlDatabase[req.params.shortURL]}`;
 
   return res.redirect(longURL);
+});
+
+//POSTS
+app.post("/logout", (req, res) => {
+  res.clearCookie('username');
+
+  res.redirect('/urls')
 });
 
 app.post("/login", (req, res) => {
