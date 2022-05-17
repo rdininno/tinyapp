@@ -2,7 +2,8 @@ const express = require("express");
 const app = express();
 const morgan = require('morgan');
 const bodyParser = require("body-parser");
-const cookieParser = require('cookie-parser')
+const cookieParser = require('cookie-parser');
+const req = require("express/lib/request");
 const PORT = 8080; // default port 8080
 
 //set up view engine
@@ -42,8 +43,14 @@ app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
+app.get("/login", (req, res) => {
+  res.render("urls_login");
+})
+
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase };
+  const templateVars = { 
+    username: req.cookies["username"], 
+    urls: urlDatabase };
   res.render("urls_index", templateVars);
 });
 
@@ -53,6 +60,7 @@ app.get("/urls/new", (req, res) => {
 
 app.get("/urls/:shortURL", (req, res) => {
   const templateVars = {
+    username: req.cookies["username"],
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL].longURL
   }
@@ -63,6 +71,14 @@ app.get("/u/:shortURL", (req, res) => {
   const longURL = `http://${urlDatabase[req.params.shortURL]}`;
 
   return res.redirect(longURL);
+});
+
+app.post("/login", (req, res) => {
+  //urlDatabase["username"] = req.body.username;
+  res.cookie('username', req.body.username)
+  //console.log(res)
+
+  res.redirect('/urls')
 });
 
 app.post("/urls", (req, res) => {
