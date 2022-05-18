@@ -7,7 +7,7 @@ const req = require("express/lib/request");
 const PORT = 8080; // default port 8080
 
 //helpers
-const { checkForEmail, generateRandomString, checkForPassword, idFromEmail } = require('./helpers');
+const { checkForEmail, generateRandomString, checkForPassword, idFromEmail, lookForCookie } = require('./helpers');
 
 //set up view engine
 app.set("view engine", "ejs");
@@ -66,14 +66,20 @@ app.get("/login", (req, res) => {
   }
 
   res.render("urls_login", templateVars);
-})
+});
 
 //new URL
 app.get("/urls/new", (req, res) => {
-  const templateVars = {
-    user: users[req.cookies["user_id"]]
+  const registered = lookForCookie(req.cookies["user_id"], users);
+
+  if (!registered) {
+    res.redirect("/login");
+  } else {
+    const templateVars = {
+      user: users[req.cookies["user_id"]]
+    }
+    res.render("urls_new", templateVars);
   }
-  res.render("urls_new", templateVars);
 });
 
 //short url
@@ -155,11 +161,18 @@ app.post("/login", (req, res) => {
 
 //urls
 app.post("/urls", (req, res) => {
-  const shortURL = generateRandomString();
-  urlDatabase[shortURL] = req.body.longURL;
+  const registered = lookForCookie(req.cookies["user_id"], users);
 
-  res.redirect(`/urls/${shortURL}`);
-})
+  if (!registered) {
+    res.status(400).send("Please register or log in to create short URL");
+    res.redirect("/login");
+  } else {
+    const shortURL = generateRandomString();
+    urlDatabase[shortURL] = req.body.longURL;
+
+    res.redirect(`/urls/${shortURL}`);
+  }
+});
 
 //delete
 app.post("/urls/:shortURL/delete", (req, res) => {
@@ -173,7 +186,7 @@ app.post("/urls/:id", (req, res) => {
   urlDatabase[req.params.id] = req.body.newURL;
 
   res.redirect("/urls")
-})
+});
 
 //////////////////////////////////////////////////////////////////////
 // Server listening...
