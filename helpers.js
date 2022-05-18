@@ -7,7 +7,7 @@ function generateRandomString() {
   }
 
   return results;
-}
+};
 
 //check is email is alrady in the database
 function checkForEmail(emailAd, users){
@@ -17,7 +17,7 @@ function checkForEmail(emailAd, users){
     }  
   }
   return false;
-}
+};
 
 //check password
 function checkForPassword(pass, users){
@@ -27,8 +27,9 @@ function checkForPassword(pass, users){
     }  
   }
   return false;
-}
+};
 
+//get user id from given email
 function idFromEmail(emailAd, users){
   for(const user in users){
     if (users[user].email === emailAd){
@@ -36,7 +37,17 @@ function idFromEmail(emailAd, users){
     }  
   }
   return false;
-}
+};
+
+//lookup by cookie in db
+function lookForCookie(cookie, users){
+  for (const user in users){
+    if(user === cookie){
+      return true;
+    }
+  }
+  return false;
+};
 
 
-module.exports = {checkForEmail, generateRandomString, checkForPassword , idFromEmail};
+module.exports = {checkForEmail, generateRandomString, checkForPassword , idFromEmail, lookForCookie};
