@@ -7,7 +7,7 @@ const req = require("express/lib/request");
 const PORT = 8080; // default port 8080
 
 //helpers
-const { checkForEmail, generateRandomString, checkForPassword, idFromEmail, lookForCookie, urlsPerUser } = require('./helpers');
+const { checkForEmail, generateRandomString, checkForPassword, idFromEmail, lookForCookie, urlsForUser } = require('./helpers');
 
 //set up view engine
 app.set("view engine", "ejs");
@@ -40,7 +40,7 @@ app.get("/urls", (req, res) => {
 
   const templateVars = {
     user: users[req.cookies["user_id"]],
-    urls: urlsPerUser(id, urlDatabase)
+    urls: urlsForUser(id, urlDatabase)
   };
 
   res.render("urls_index", templateVars);

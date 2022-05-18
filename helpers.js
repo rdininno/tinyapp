@@ -50,7 +50,7 @@ function lookForCookie(cookie, users){
 };
 
 //lookup urls for user
-function urlsPerUser(userID, users){
+function urlsForUser(userID, users){
   const userURL = {};
   for (const url in users){
     if(users[url].userID === userID){
@@ -62,4 +62,4 @@ function urlsPerUser(userID, users){
 }
 
 
-module.exports = {checkForEmail, generateRandomString, checkForPassword , idFromEmail, lookForCookie, urlsPerUser};
+module.exports = {checkForEmail, generateRandomString, checkForPassword , idFromEmail, lookForCookie, urlsForUser};
