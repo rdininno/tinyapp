@@ -11,12 +11,13 @@
   <title>TinyApp</title>
 </head>
 
-<body>
+<body >
   <%- include('partials/_header') %>
-
+<p>
   <form method="POST" action="/register">
-    <input id="email" type="email" name=email placeholder="email">
+    <input id="email" type="email" name=email placeholder="email" style="margin-left: 20px;">
     <input id="password" type="password" name=password placeholder="password">
     <button type="submit" class="btn btn-primary">Register</button>
   </form>
+</p>
 </body>
