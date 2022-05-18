@@ -16,12 +16,14 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser())
 
 ///////////////////////////////////////////////////////////////
-// DATABASE
+// DATABASES
 ///////////////////////////////////////////////////////////////
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
+
+const users = {};
 
 ///////////////////////////////////////////////////////////////
 // RANDOM STRING GENERATOR
@@ -46,28 +48,29 @@ app.get("/", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  const templateVars = { 
-    username: req.cookies["username"], 
-    urls: urlDatabase };
+  const templateVars = {
+    username: req.cookies["username"],
+    urls: urlDatabase
+  };
   res.render("urls_index", templateVars);
 });
 
 app.get("/register", (req, res) => {
-  const templateVars = { 
+  const templateVars = {
     username: req.cookies["username"],
   }
   res.render("urls_register", templateVars);
 });
 
 app.get("/login", (req, res) => {
-  const templateVars = { 
+  const templateVars = {
     username: req.cookies["username"],
   }
   res.render("urls_login", templateVars);
 })
 
 app.get("/urls/new", (req, res) => {
-  const templateVars = { 
+  const templateVars = {
     username: req.cookies["username"],
   }
   res.render("urls_new", templateVars);
@@ -95,6 +98,20 @@ app.post("/logout", (req, res) => {
   res.redirect('/urls')
 });
 
+app.post("/register", (req, res) => {
+  const userID = generateRandomString();
+  users[userID] ={
+    id: userID,
+    email: req.body.email,
+    password: req.body.password
+  }
+  res.cookie('user_id', userID);
+
+  console.log(users);
+
+  res.redirect("/urls");
+});
+
 app.post("/login", (req, res) => {
   //urlDatabase["username"] = req.body.username;
   res.cookie('username', req.body.username)
@@ -118,7 +135,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 app.post("/urls/:id", (req, res) => {
   urlDatabase[req.params.id] = req.body.newURL;
-  
+
   res.redirect("/urls")
 })
 
