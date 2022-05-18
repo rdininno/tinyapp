@@ -7,7 +7,7 @@ const req = require("express/lib/request");
 const PORT = 8080; // default port 8080
 
 //helpers
-const {checkForEmail , generateRandomString} = require('./helpers');
+const { checkForEmail, generateRandomString, checkForPassword, idFromEmail } = require('./helpers');
 
 //set up view engine
 app.set("view engine", "ejs");
@@ -34,6 +34,7 @@ const users = {};
 ///////////////////////////////////////////////////////////////
 
 //GETS
+///////////////////////////////////////////////////////////////
 // index/home
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -104,9 +105,9 @@ app.get("/hello", (req, res) => {
 });
 
 //POSTS
+///////////////////////////////////////////////////////////////
 //logout
 app.post("/logout", (req, res) => {
-  res.clearCookie('username');
   res.clearCookie('user_id');
 
   res.redirect('/urls')
@@ -135,11 +136,21 @@ app.post("/register", (req, res) => {
 
 //login
 app.post("/login", (req, res) => {
-  //urlDatabase["username"] = req.body.username;
-  res.cookie('username', req.body.username)
-  //console.log(res)
+  const email = req.body.email;
+  const password = req.body.password
+  const userID = idFromEmail(email, users)
 
-  res.redirect('/urls')
+  if (!checkForEmail(email, users)) {
+    res.status(403).send("Email not found");
+  } else {
+    if (!checkForPassword(password, users)) {
+      res.status(403).send('Password incorrect');
+    } else {
+      console.log(userID)
+      res.cookie('user_id', userID);
+      res.redirect('/urls')
+    }
+  }
 });
 
 //urls
