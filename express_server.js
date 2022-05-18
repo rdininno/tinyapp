@@ -4,6 +4,7 @@ const morgan = require('morgan');
 const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
 const req = require("express/lib/request");
+const lookUpUser = require('./helpers');
 const PORT = 8080; // default port 8080
 
 //set up view engine
@@ -26,7 +27,7 @@ const urlDatabase = {
 const users = {};
 
 ///////////////////////////////////////////////////////////////
-// RANDOM STRING GENERATOR
+// FUNCTIONS
 ///////////////////////////////////////////////////////////////
 function generateRandomString() {
   let results = '';
@@ -37,6 +38,16 @@ function generateRandomString() {
 
   return results;
 }
+
+// function lookUpUser(id, users){
+//   for(const user in users){
+//     if(user === id){
+//       console.log("ID: ", user)
+//       console.log("user: ", users[user])
+//       return users[user];
+//     }
+//   }
+// }
 
 ///////////////////////////////////////////////////////////////
 // ROUTES
@@ -49,39 +60,43 @@ app.get("/", (req, res) => {
 
 app.get("/urls", (req, res) => {
   const templateVars = {
-    username: req.cookies["username"],
+    user: users[req.cookies["user_id"]],
     urls: urlDatabase
   };
+
   res.render("urls_index", templateVars);
 });
 
 app.get("/register", (req, res) => {
-  const templateVars = {
-    username: req.cookies["username"],
+const templateVars = {
+    user: users[req.cookies["user_id"]]
   }
+
   res.render("urls_register", templateVars);
 });
 
 app.get("/login", (req, res) => {
   const templateVars = {
-    username: req.cookies["username"],
+    user: users[req.cookies["user_id"]]
   }
+
   res.render("urls_login", templateVars);
 })
 
 app.get("/urls/new", (req, res) => {
   const templateVars = {
-    username: req.cookies["username"],
+    user: users[req.cookies["user_id"]]
   }
   res.render("urls_new", templateVars);
 });
 
 app.get("/urls/:shortURL", (req, res) => {
   const templateVars = {
-    username: req.cookies["username"],
+    user: users[req.cookies["user_id"]],
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL].longURL
   }
+
   res.render("urls_show", templateVars);
 });
 
@@ -106,8 +121,6 @@ app.post("/register", (req, res) => {
     password: req.body.password
   }
   res.cookie('user_id', userID);
-
-  console.log(users);
 
   res.redirect("/urls");
 });
