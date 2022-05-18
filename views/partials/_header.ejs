@@ -12,19 +12,20 @@
       </div>
 
       <div class="navbar">
-      <% if(!username) { %>
-        <form method="POST" action="/login">
-          <input id="name" type="text" name="username" placeholder="username">
-          <button type="submit" class="btn btn-primary">Sign In</button>
-        </form>
-        <% } else { %>
-          
-          <h6 class="nav-item nav-link"> 
-            Logged in as: <%= username %> 
-          </h6>
+      <% if (user) { %>
+        <h6 class="nav-item nav-link"> 
+          Logged in as: <%= user.email %> 
+        </h6>
 
-          <form method="POST" action="/logout">
-            <button type="submit" class="btn btn-primary">Logout</button>
+        <form method="POST" action="/logout">
+          <button type="submit" class="btn btn-primary">Logout</button>
+        </form>
+        
+        <% } else { %>
+
+          <form method="POST" action="/login">
+            <input id="name" type="text" name="username" placeholder="username">
+            <button type="submit" class="btn btn-primary">Sign In</button>
           </form>
 
           <% } %>
