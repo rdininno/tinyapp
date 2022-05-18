@@ -19,6 +19,24 @@ function checkForEmail(emailAd, users){
   return false;
 }
 
+//check password
+function checkForPassword(pass, users){
+  for(const user in users){
+    if (users[user].password === pass){
+      return true
+    }  
+  }
+  return false;
+}
+
+function idFromEmail(emailAd, users){
+  for(const user in users){
+    if (users[user].email === emailAd){
+      return users[user].id;
+    }  
+  }
+  return false;
+}
 
 
-module.exports = {checkForEmail, generateRandomString};
+module.exports = {checkForEmail, generateRandomString, checkForPassword , idFromEmail};
