@@ -49,5 +49,17 @@ function lookForCookie(cookie, users){
   return false;
 };
 
+//lookup urls for user
+function urlsPerUser(userID, users){
+  const userURL = {};
+  for (const url in users){
+    if(users[url].userID === userID){
+      userURL[url] = users[url];
+    }
+  }
 
-module.exports = {checkForEmail, generateRandomString, checkForPassword , idFromEmail, lookForCookie};
+  return userURL;
+}
+
+
+module.exports = {checkForEmail, generateRandomString, checkForPassword , idFromEmail, lookForCookie, urlsPerUser};
