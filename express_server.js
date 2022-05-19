@@ -4,10 +4,11 @@ const morgan = require('morgan');
 const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
 const req = require("express/lib/request");
+const bcrypt = require('bcryptjs');
 const PORT = 8080; // default port 8080
 
 //helpers
-const { checkForEmail, generateRandomString, checkForPassword, idFromEmail, lookForCookie, urlsForUser } = require('./helpers');
+const { checkForEmail, generateRandomString, idFromEmail, lookForCookie, urlsForUser } = require('./helpers');
 const { send } = require("express/lib/response");
 
 //set up view engine
@@ -74,7 +75,7 @@ app.get("/register", (req, res) => {
 
 app.post("/register", (req, res) => {
   const email = req.body.email;
-  const password = req.body.password
+  const password = bcrypt.hashSync(req.body.password, 10);
   const userID = generateRandomString();
 
   if (!email || !password) {
@@ -103,13 +104,12 @@ app.get("/login", (req, res) => {
 
 app.post("/login", (req, res) => {
   const email = req.body.email;
-  const password = req.body.password
   const userID = idFromEmail(email, users)
 
   if (!checkForEmail(email, users)) {
     res.status(403).send("Email not found");
   } else {
-    if (!checkForPassword(password, users)) {
+    if (!bcrypt.compareSync(req.body.password, users[userID].password)) {
       res.status(403).send('Password incorrect');
     } else {
       console.log(userID)
