@@ -8,6 +8,7 @@ const PORT = 8080; // default port 8080
 
 //helpers
 const { checkForEmail, generateRandomString, checkForPassword, idFromEmail, lookForCookie, urlsForUser } = require('./helpers');
+const { send } = require("express/lib/response");
 
 //set up view engine
 app.set("view engine", "ejs");
@@ -29,12 +30,12 @@ const users = {};
 // ROUTES
 ///////////////////////////////////////////////////////////////
 
-// INDEX/HOME
+// HOME //
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
-//URLS PAGE
+// URLS PAGE //
 app.get("/urls", (req, res) => {
   const id = users[req.cookies["user_id"]]
 
@@ -58,12 +59,11 @@ app.post("/urls", (req, res) => {
       longURL: req.body.longURL,
       userID: users[req.cookies["user_id"]]
     };
-
     res.redirect(`/urls/${shortURL}`);
   }
 });
 
-//REGISTER
+// REGISTER //
 app.get("/register", (req, res) => {
   const templateVars = {
     user: users[req.cookies["user_id"]]
@@ -92,7 +92,7 @@ app.post("/register", (req, res) => {
   res.redirect("/urls");
 });
 
-//LOGIN
+// LOGIN //
 app.get("/login", (req, res) => {
   const templateVars = {
     user: users[req.cookies["user_id"]]
@@ -119,7 +119,7 @@ app.post("/login", (req, res) => {
   }
 });
 
-//NEW URL
+// NEW URL //
 app.get("/urls/new", (req, res) => {
   const registered = lookForCookie(req.cookies["user_id"], users);
 
@@ -133,60 +133,84 @@ app.get("/urls/new", (req, res) => {
   }
 });
 
-//SHORT URL
+// SHORT URL //
 app.get("/urls/:shortURL", (req, res) => {
-  const userID = users[req.cookies["user_id"]];
-
-  const templateVars = {
-    shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL].longURL,
-    urlUserID: urlDatabase[req.params.shortURL].userID,
-    user: userID
+  if (urlDatabase[req.params.shortURL]) {
+    const templateVars = {
+      shortURL: req.params.shortURL,
+      longURL: urlDatabase[req.params.shortURL].longURL,
+      urlUserID: urlDatabase[req.params.shortURL].userID,
+      user: users[req.cookies["user_id"]]
+    };
+    res.render("urls_show", templateVars);
+  } else {
+    res.status(404).send("address does not exist");
   }
-
-  res.render("urls_show", templateVars);
 });
 
-//REDIRECT TO LONG URL
+// REDIRECT TO LONG URL //
 app.get("/u/:shortURL", (req, res) => {
   if (urlDatabase[req.params.shortURL]) {
     const longURL = `http://${urlDatabase[req.params.shortURL].longURL}`;
-
-    return res.redirect(longURL);
+    if (longURL === undefined) {
+      res.status(302);
+    } else {
+      return res.redirect(longURL);
+    }
   } else {
     res.status(404).send("Short URL does not have a long URL");
   }
 });
 
-//json
+// json //
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
-//hello page
+// hello page //
 app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
-//LOGOUT
+// LOGOUT //
 app.post("/logout", (req, res) => {
   res.clearCookie('user_id');
 
   res.redirect('/urls')
 });
 
-//DELETE
+// DELETE //
 app.post("/urls/:shortURL/delete", (req, res) => {
-  delete urlDatabase[req.params.shortURL];
-
-  res.redirect("/urls");
+  if (users[req.cookies["user_id"]] === undefined) {
+    res.send("need to be logged in delete!");
+  } else {
+    const userID = users[req.cookies["user_id"]];
+    const userUrls = Object.keys(urlsForUser(userID, urlDatabase));
+    
+    if (userUrls.includes(req.params.shortURL)) {
+      delete urlDatabase[req.params.shortURL];
+      res.redirect("/urls");
+    } else {
+      res.send("need to own url to delete");
+    }
+  }
 });
 
-//UPDATE LONG URL
+// UPDATE LONG URL //
 app.post("/urls/:id", (req, res) => {
-  urlDatabase[req.params.id].longURL = req.body.newURL;
+  if (users[req.cookies["user_id"]] === undefined) {
+    res.send("need to be logged in edit!");
+  } else {
+    const userID = users[req.cookies["user_id"]];
+    const userUrls = Object.keys(urlsForUser(userID, urlDatabase));
 
-  res.redirect("/urls")
+    if (userUrls.includes(req.params.id)) {
+      urlDatabase[req.params.id].longURL = req.body.newURL;
+      res.redirect("/urls");
+    } else {
+      res.send("need to own url to edit");
+    }
+  }
 });
 
 //////////////////////////////////////////////////////////////////////
