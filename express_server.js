@@ -1,10 +1,10 @@
 const express = require("express");
-const app = express();
 const morgan = require('morgan');
 const bodyParser = require("body-parser");
 const cookieSession = require('cookie-session')
-const req = require("express/lib/request");
 const bcrypt = require('bcryptjs');
+
+const app = express();
 const PORT = 8080; // default port 8080
 
 //helpers
@@ -22,10 +22,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 //session
 app.use(cookieSession({
-  name: 'session',
-  keys: ['Bobby_Beats'],
+  name: 'tinyAppCookie',
+  keys: ['CaRRoTCaKe', 'CHeeSeCaKe', '42o69'],
   maxAge: 24 * 60 * 60 * 1000
-}))
+}));
 
 ///////////////////////////////////////////////////////////////
 // DATABASES
@@ -39,7 +39,12 @@ const users = {};
 
 // HOME //
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  if (lookForCookie(req.session.user_id, users)) {
+    res.redirect("/urls");
+  } else {
+    res.redirect('/login');
+  }
+
 });
 
 // URLS PAGE //
@@ -59,7 +64,6 @@ app.post("/urls", (req, res) => {
 
   if (!registered) {
     res.status(400).send("Please register or log in to create short URL");
-    res.redirect("/login");
   } else {
     const shortURL = generateRandomString();
     urlDatabase[shortURL] = {
@@ -72,17 +76,23 @@ app.post("/urls", (req, res) => {
 
 // REGISTER //
 app.get("/register", (req, res) => {
-  const templateVars = {
-    user: users[req.session.user_id]
-  };
+  if (lookForCookie(req.session.user_id, users)) {
+    res.redirect("/urls");
+  } else {
+    const templateVars = {
+      user: users[req.session.user_id]
+    };
 
-  res.render("urls_register", templateVars);
+    res.render("urls_register", templateVars);
+  }
 });
 
 app.post("/register", (req, res) => {
   const email = req.body.email;
-  const password = bcrypt.hashSync(req.body.password, 10);
   const userID = generateRandomString();
+  const salt = bcrypt.genSaltSync(10);
+  const password = bcrypt.hashSync(req.body.password, salt);
+
 
   if (!email || !password) {
     res.status(400).send("Please enter a valid email address AND password");
@@ -101,11 +111,15 @@ app.post("/register", (req, res) => {
 
 // LOGIN //
 app.get("/login", (req, res) => {
-  const templateVars = {
-    user: users[req.session.user_id]
-  };
+  if (lookForCookie(req.session.user_id, users)) {
+    res.redirect("/urls");
+  } else {
+    const templateVars = {
+      user: users[req.session.user_id]
+    };
 
-  res.render("urls_login", templateVars);
+    res.render("urls_login", templateVars);
+  }
 });
 
 app.post("/login", (req, res) => {
@@ -126,9 +140,7 @@ app.post("/login", (req, res) => {
 
 // NEW URL //
 app.get("/urls/new", (req, res) => {
-  const registered = lookForCookie(req.session.user_id, users);
-
-  if (!registered) {
+  if (!lookForCookie(req.session.user_id, users)) {
     res.redirect("/login");
   } else {
     const templateVars = {
@@ -140,16 +152,20 @@ app.get("/urls/new", (req, res) => {
 
 // SHORT URL //
 app.get("/urls/:shortURL", (req, res) => {
-  if (urlDatabase[req.params.shortURL]) {
-    const templateVars = {
-      shortURL: req.params.shortURL,
-      longURL: urlDatabase[req.params.shortURL].longURL,
-      urlUserID: urlDatabase[req.params.shortURL].userID,
-      user: users[req.session.user_id]
-    };
-    res.render("urls_show", templateVars);
+  if (!lookForCookie(req.session.user_id, users)) {
+    res.send("please log in to view or edit");
   } else {
-    res.status(404).send("address does not exist");
+    if (urlDatabase[req.params.shortURL]) {
+      const templateVars = {
+        shortURL: req.params.shortURL,
+        longURL: urlDatabase[req.params.shortURL].longURL,
+        urlUserID: urlDatabase[req.params.shortURL].userID,
+        user: users[req.session.user_id]
+      };
+      res.render("urls_show", templateVars);
+    } else {
+      res.status(404).send("address does not exist");
+    }
   }
 });
 
@@ -158,7 +174,7 @@ app.get("/u/:shortURL", (req, res) => {
   if (urlDatabase[req.params.shortURL]) {
     const longURL = `http://${urlDatabase[req.params.shortURL].longURL}`;
     if (longURL === undefined) {
-      res.status(302);
+      res.status(404).send("address is undefined");
     } else {
       return res.redirect(longURL);
     }
@@ -167,36 +183,26 @@ app.get("/u/:shortURL", (req, res) => {
   }
 });
 
-// json //
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-});
-
-// hello page //
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
-});
-
 // LOGOUT //
 app.post("/logout", (req, res) => {
   req.session = null;
 
-  res.redirect('/urls')
+  res.redirect('/login')
 });
 
 // DELETE //
-app.post("/urls/:shortURL/delete", (req, res) => {
+app.post("/urls/:id/delete", (req, res) => {
   if (users[req.session.user_id] === undefined) {
-    res.send("need to be logged in delete!");
+    res.status(423).send("need to be logged in delete!");
   } else {
     const userID = users[req.session.user_id];
     const userUrls = Object.keys(urlsForUser(userID, urlDatabase));
-    
-    if (userUrls.includes(req.params.shortURL)) {
-      delete urlDatabase[req.params.shortURL];
+
+    if (userUrls.includes(req.params.id)) {
+      delete urlDatabase[req.params.id];
       res.redirect("/urls");
     } else {
-      res.send("need to own url to delete");
+      res.status(412).send("need to own url to delete");
     }
   }
 });
@@ -204,7 +210,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 // UPDATE LONG URL //
 app.post("/urls/:id", (req, res) => {
   if (users[req.session.user_id] === undefined) {
-    res.send("need to be logged in edit!");
+    res.status(423).send("need to be logged in edit!");
   } else {
     const userID = users[req.session.user_id];
     const userUrls = Object.keys(urlsForUser(userID, urlDatabase));
@@ -213,9 +219,14 @@ app.post("/urls/:id", (req, res) => {
       urlDatabase[req.params.id].longURL = req.body.newURL;
       res.redirect("/urls");
     } else {
-      res.send("need to own url to edit");
+      res.status(412).send("need to own url to edit");
     }
   }
+});
+
+// json //
+app.get("/urls.json", (req, res) => {
+  res.json(urlDatabase);
 });
 
 //////////////////////////////////////////////////////////////////////
