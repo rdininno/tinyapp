@@ -93,8 +93,7 @@ app.post("/register", (req, res) => {
   const salt = bcrypt.genSaltSync(10);
   const password = bcrypt.hashSync(req.body.password, salt);
 
-
-  if (!email || !password) {
+  if (!email || !req.body.password) {
     res.status(400).send("Please enter a valid email address AND password");
   } else if (checkForEmail(email, users)) {
     res.status(400).send("Email already exists");
@@ -192,7 +191,7 @@ app.post("/logout", (req, res) => {
 
 // DELETE //
 app.post("/urls/:id/delete", (req, res) => {
-  if (users[req.session.user_id] === undefined) {
+  if (!users[req.session.user_id]) {
     res.status(423).send("need to be logged in delete!");
   } else {
     const userID = users[req.session.user_id];
@@ -209,7 +208,7 @@ app.post("/urls/:id/delete", (req, res) => {
 
 // UPDATE LONG URL //
 app.post("/urls/:id", (req, res) => {
-  if (users[req.session.user_id] === undefined) {
+  if (!users[req.session.user_id]) {
     res.status(423).send("need to be logged in edit!");
   } else {
     const userID = users[req.session.user_id];
