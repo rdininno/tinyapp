@@ -29,7 +29,6 @@ function idFromEmail(emailUser, users) {
       return users[user].id;
     }
   }
-  return false;
 };
 
 //lookup by cookie in db
