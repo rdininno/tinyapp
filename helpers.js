@@ -23,9 +23,9 @@ function checkForEmail(emailAd, users) {
 
 
 //get user id from given email
-function idFromEmail(emailAd, users) {
+function idFromEmail(emailUser, users) {
   for (const user in users) {
-    if (users[user].email === emailAd) {
+    if (users[user].email === emailUser) {
       return users[user].id;
     }
   }
