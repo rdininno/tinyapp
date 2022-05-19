@@ -50,11 +50,11 @@ function lookForCookie(cookie, users){
 };
 
 //lookup urls for user
-function urlsForUser(userID, users){
+function urlsForUser(userID, usersDB){
   const userURL = {};
-  for (const url in users){
-    if(users[url].userID === userID){
-      userURL[url] = users[url];
+  for (const url in usersDB){
+    if(usersDB[url].userID === userID){
+      userURL[url] = usersDB[url];
     }
   }
 
