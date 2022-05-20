@@ -28,7 +28,7 @@ const testDB = {
     longURL: 'http://www.nfl.com',
     userID: "user2RandomID"
   }
-}
+};
 
 //tests for idFromEmail
 describe('idFromEmail', () => {
@@ -51,12 +51,12 @@ describe("checkForEmail", () => {
   it('return true if email is in the database', () => {
     const email = checkForEmail("user@example.com", testUsers);
 
-    assert.isTrue(email)
+    assert.isTrue(email);
   });
   it('return false if email is not in the database', () => {
     const email = checkForEmail("user3@example.com", testUsers);
 
-    assert.isFalse(email)
+    assert.isFalse(email);
   });
 });
 
@@ -87,7 +87,7 @@ describe("urlsForUser", () => {
         longURL: 'http://www.abc.com',
         userID:"userRandomID"
       }
-    }
+    };
 
     assert.deepEqual(userURL, expected);
   });
