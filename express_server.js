@@ -9,7 +9,6 @@ const PORT = 8080; // default port 8080
 
 //helpers
 const { checkForEmail, generateRandomString, idFromEmail, lookForCookie, urlsForUser } = require('./helpers');
-const { send } = require("express/lib/response");
 
 //set up view engine
 app.set("view engine", "ejs");
