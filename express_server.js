@@ -44,7 +44,6 @@ app.get("/", (req, res) => {
   } else {
     res.redirect('/login');
   }
-
 });
 
 // URLS PAGE //
@@ -55,7 +54,6 @@ app.get("/urls", (req, res) => {
     user: users[req.session.user_id],
     urls: urlsForUser(id, urlDatabase)
   };
-
   res.render("urls_index", templateVars);
 });
 
@@ -82,7 +80,6 @@ app.get("/register", (req, res) => {
     const templateVars = {
       user: users[req.session.user_id]
     };
-
     res.render("urls_register", templateVars);
   }
 });
@@ -116,7 +113,6 @@ app.get("/login", (req, res) => {
     const templateVars = {
       user: users[req.session.user_id]
     };
-
     res.render("urls_login", templateVars);
   }
 });
