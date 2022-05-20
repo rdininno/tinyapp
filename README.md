@@ -4,9 +4,9 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 ## Final Product
 
-!["Log in page"](https://www.flickr.com/photos/195666228@N07/52085570278/in/album-72177720299099724/)
-!["view and edit page"](https://www.flickr.com/photos/195666228@N07/52086045135/in/album-72177720299099724/)
-!["users homepage. database of their urls"](https://www.flickr.com/photos/195666228@N07/52086045140/in/album-72177720299099724/)
+!["Log in page"](https://github.com/rdininno/tinyapp/blob/main/docs/Login-page.png?raw=true)
+!["view and edit page"](https://github.com/rdininno/tinyapp/blob/main/docs/nrew-url-page.png?raw=true)
+!["users homepage. database of their urls"](https://github.com/rdininno/tinyapp/blob/main/docs/urls-page.png?raw=true)
 
 ## Dependencies
 
