@@ -1,9 +1,7 @@
-const bcrypt = require("bcryptjs/dist/bcrypt");
-
 //Generate a random string of characters for user id
-function generateRandomString() {
+const generateRandomString = () => {
   let results = '';
-  const char = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  const char = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   for (let ii = 0; ii < 6; ii++) {
     results += char.charAt(Math.floor(Math.random() * char.length));
   }
@@ -12,10 +10,10 @@ function generateRandomString() {
 };
 
 //check is email is alrady in the database
-function checkForEmail(emailAd, users) {
+const checkForEmail = (emailAd, users) => {
   for (const user in users) {
     if (users[user].email === emailAd) {
-      return true
+      return true;
     }
   }
   return false;
@@ -23,7 +21,7 @@ function checkForEmail(emailAd, users) {
 
 
 //get user id from given email
-function idFromEmail(emailUser, users) {
+const idFromEmail = (emailUser, users) => {
   for (const user in users) {
     if (users[user].email === emailUser) {
       return users[user].id;
@@ -32,7 +30,7 @@ function idFromEmail(emailUser, users) {
 };
 
 //lookup by cookie in db
-function lookForCookie(cookie, users) {
+const lookForCookie = (cookie, users) => {
   for (const user in users) {
     if (user === cookie) {
       return true;
@@ -42,7 +40,7 @@ function lookForCookie(cookie, users) {
 };
 
 //lookup urls for user
-function urlsForUser(userID, usersDB) {
+const urlsForUser = (userID, usersDB) => {
   const userURL = {};
   for (const url in usersDB) {
     if (usersDB[url].userID === userID) {
@@ -51,7 +49,7 @@ function urlsForUser(userID, usersDB) {
   }
 
   return userURL;
-}
+};
 
 
 module.exports = { checkForEmail, generateRandomString, idFromEmail, lookForCookie, urlsForUser };

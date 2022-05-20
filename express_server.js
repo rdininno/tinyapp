@@ -1,7 +1,7 @@
 const express = require("express");
 const morgan = require('morgan');
 const bodyParser = require("body-parser");
-const cookieSession = require('cookie-session')
+const cookieSession = require('cookie-session');
 const bcrypt = require('bcryptjs');
 
 const app = express();
@@ -48,7 +48,7 @@ app.get("/", (req, res) => {
 
 // URLS PAGE //
 app.get("/urls", (req, res) => {
-  const id = users[req.session.user_id]
+  const id = users[req.session.user_id];
 
   const templateVars = {
     user: users[req.session.user_id],
@@ -99,7 +99,7 @@ app.post("/register", (req, res) => {
       id: userID,
       email: email,
       password: password
-    }
+    };
     req.session.user_id = userID;
   }
   res.redirect("/urls");
@@ -119,7 +119,7 @@ app.get("/login", (req, res) => {
 
 app.post("/login", (req, res) => {
   const email = req.body.email;
-  const userID = idFromEmail(email, users)
+  const userID = idFromEmail(email, users);
 
   if (!checkForEmail(email, users)) {
     res.status(403).send("Email not found");
@@ -128,7 +128,7 @@ app.post("/login", (req, res) => {
       res.status(403).send('Password incorrect');
     } else {
       req.session.user_id = userID;
-      res.redirect('/urls')
+      res.redirect('/urls');
     }
   }
 });
@@ -182,7 +182,7 @@ app.get("/u/:shortURL", (req, res) => {
 app.post("/logout", (req, res) => {
   req.session = null;
 
-  res.redirect('/login')
+  res.redirect('/login');
 });
 
 // DELETE //
